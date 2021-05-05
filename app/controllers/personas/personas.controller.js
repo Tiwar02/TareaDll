@@ -1,5 +1,12 @@
 const PostgresService = require('../../services/postgres.service')
 const _pg = new PostgresService();
+
+
+const EmailService = require('../../services/email.service');
+const _email = new EmailService();
+
+const ExcelService = require('../../services/excel.service');
+
 /**
  * Consultar todas las personas
  * @param {Request} req 
@@ -11,7 +18,10 @@ const getPersonas = async (req, res) => {
         let sql= 'select * from personas';
         let result = await _pg.executeSql(sql);
         let rows = result.rows;
+        const _excel = new ExcelService();
+        await _excel.createWorkSheet(rows);
         return res.send({
+            url: 'http://localhost:3001/personas.xlsx',
             ok:true,
             message:"Personas consultadas",
             content: rows,
@@ -19,14 +29,19 @@ const getPersonas = async (req, res) => {
     } catch (error){
         return res.send({
             ok:false,
-            message:"Ha ocurrido un error crenado el usuario",
+            message:"Ha ocurrido un error creando el usuario",
             content: error,
         });
     }
     
     
 }
-
+ /**
+  * Consultar una persona por id
+  * @param {Request} req 
+  * @param {Response} res 
+  * @returns 
+  */
 const getPersona = async (req, res) => {
     try{
         let id = req.params.id;
@@ -49,12 +64,21 @@ const getPersona = async (req, res) => {
     
 }
 
+/**
+ * Crear una persona
+ * @param {Request} req 
+ * @param {Response} res 
+ * @returns 
+ */
 const createPersona = async (req, res) => {
     try {
         let user = req.body;
         let sql = `INSERT INTO public.personas (name, email) VALUES( '${user.name}', '${user.email}');`;
         let result = await _pg.executeSql(sql);
         console.log(result);
+        if (result.rowCount==1) {
+            _email.sendEmail(user.email);
+        }
         return res.send({
             ok:true,
             message: result.rowCount ==1? "Persona creada" : "El usuario no fue creado",
@@ -71,6 +95,12 @@ const createPersona = async (req, res) => {
     
 };
 
+/**
+ * Actualizar info de persona
+ * @param {Request} req 
+ * @param {Response} res 
+ * @returns 
+ */
 const updatePersona = async (req, res) => {
     try{
         let id = req.params.id;
@@ -92,6 +122,12 @@ const updatePersona = async (req, res) => {
     }
 }
 
+/**
+ * Eliminar persona
+ * @param {Request} req 
+ * @param {Response} res 
+ * @returns 
+ */
 const deletePersona = async (req, res) => {
     try{
         let id = req.params.id;
@@ -110,5 +146,24 @@ const deletePersona = async (req, res) => {
         });
     }
 }
+
+const report = async (req, res) => {
+	try {
+		let rows = await getUsers();
+		const excel = new ExcelService();
+		await excel.createWorkSheet(rows);
+		return res.send({
+			url: "http://localhost:3001/reportes/personas.xlsx",
+			ok: true,
+			message: "Reporte entregado",
+		});
+	} catch (error) {
+		return res.send({
+			ok: false,
+			message: "ERROR",
+			content: error,
+		});
+	}
+};
 
 module.exports = {getPersonas, getPersona, createPersona, updatePersona, deletePersona};
