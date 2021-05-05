@@ -1,0 +1,25 @@
+{
+  "name": "tareadll",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Tiwar02/TareaDll.git"
+  },
+  "author": "SSG",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Tiwar02/TareaDll/issues"
+  },
+  "homepage": "https://github.com/Tiwar02/TareaDll#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "nodemon": "^2.0.7",
+    "pg": "^8.6.0"
+  }
+}
