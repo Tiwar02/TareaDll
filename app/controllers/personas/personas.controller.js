@@ -20,6 +20,7 @@ const getPersonas = async (req, res) => {
         let rows = result.rows;
         const _excel = new ExcelService();
         await _excel.createWorkSheet(rows);
+        //res.download('http://localhost:3001/personas.xlsx');
         return res.send({
             url: 'http://localhost:3001/personas.xlsx',
             ok:true,
