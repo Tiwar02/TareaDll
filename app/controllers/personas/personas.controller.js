@@ -18,11 +18,7 @@ const getPersonas = async (req, res) => {
         let sql= 'select * from personas';
         let result = await _pg.executeSql(sql);
         let rows = result.rows;
-        const _excel = new ExcelService();
-        await _excel.createWorkSheet(rows);
-        //res.download('http://localhost:3001/personas.xlsx');
         return res.send({
-            url: 'http://localhost:3001/personas.xlsx',
             ok:true,
             message:"Personas consultadas",
             content: rows,
@@ -30,40 +26,14 @@ const getPersonas = async (req, res) => {
     } catch (error){
         return res.send({
             ok:false,
-            message:"Ha ocurrido un error creando el usuario",
+            message:"Ha ocurrido un error obteniendo los usuarios",
             content: error,
         });
     }
     
     
 }
- /**
-  * Consultar una persona por id
-  * @param {Request} req 
-  * @param {Response} res 
-  * @returns 
-  */
-const getPersona = async (req, res) => {
-    try{
-        let id = req.params.id;
-        let sql= "select * from personas WHERE id='" + id + "'";
-        let result = await _pg.executeSql(sql);
-        let rows = result.rows;
-        return res.send({
-            ok:true,
-            message:"Personas consultada",
-            content: rows[0],
-        });
-    } catch (error){
-        return res.send({
-            ok:false,
-            message:"Ha ocurrido un error crenado el usuario",
-            content: error,
-        });
-    }
-    
-    
-}
+ 
 
 /**
  * Crear una persona
@@ -88,7 +58,7 @@ const createPersona = async (req, res) => {
     } catch (error) {
         return res.send({
             ok:false,
-            message:"Ha ocurrido un error creando el usuario",
+            message:"Ha ocurrido un error CREANDO el usuario",
             content: error,
         });
     }
@@ -136,8 +106,7 @@ const deletePersona = async (req, res) => {
         let result = await _pg.executeSql(sql);
         return res.send({
             ok:true,
-            message: result.rowCount ==1? "Persona eliminada" : "El usuario no fue eliminado",
-            content: user,
+            message: result.rowCount ==1? "Persona eliminada" : "El usuario no fue eliminado"
         });
     } catch (error) {
         return res.send({
@@ -150,11 +119,12 @@ const deletePersona = async (req, res) => {
 
 const report = async (req, res) => {
 	try {
-		let rows = await getUsers();
+        let sql= 'select * from personas';
+        let result = await _pg.executeSql(sql);
+        let rows = result.rows;
 		const excel = new ExcelService();
-		await excel.createWorkSheet(rows);
+		await excel.excelCreado(rows);
 		return res.send({
-			url: "http://localhost:3001/reportes/personas.xlsx",
 			ok: true,
 			message: "Reporte entregado",
 		});
@@ -167,4 +137,4 @@ const report = async (req, res) => {
 	}
 };
 
-module.exports = {getPersonas, getPersona, createPersona, updatePersona, deletePersona};
+module.exports = {getPersonas, createPersona, updatePersona, deletePersona, report};
